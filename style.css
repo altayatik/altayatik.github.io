@@ -1,28 +1,158 @@
+/* style.css – Updated for even wider text/content area */
+
 body {
-    background-color: #222;
-    color: #fff;
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    line-height: 1.5;
-  }
-  
-  .container {
-    margin: 0 auto;
-    max-width: 600px;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, #000000, #101010, #202020);
+    color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.background-animation {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: inherit;
+    z-index: -1;
+}
+
+/* Yellow sparks – unchanged */
+.spark {
+    position: absolute;
+    background: #ffd700;
+    border-radius: 50%;
+    pointer-events: none;
+    box-shadow: 0 0 10px #ffd700, 0 0 20px rgba(255, 215, 0, 0.6), 0 0 30px rgba(255, 165, 0, 0.3);
+    opacity: 0.8;
+}
+
+/* Spark positions unchanged */
+.spark:nth-child(1) { width: 4px; height: 4px; top: 10%; left: 8%; animation: drift1 22s linear infinite; }
+.spark:nth-child(2) { width: 6px; height: 6px; top: 15%; left: 85%; animation: drift2 28s linear infinite; }
+.spark:nth-child(3) { width: 3px; height: 3px; top: 25%; left: 40%; animation: drift3 20s linear infinite; }
+.spark:nth-child(4) { width: 5px; height: 5px; top: 30%; left: 70%; animation: drift4 25s linear infinite; }
+.spark:nth-child(5) { width: 7px; height: 7px; top: 35%; left: 20%; animation: drift5 30s linear infinite; }
+.spark:nth-child(6) { width: 4px; height: 4px; top: 40%; left: 95%; animation: drift1 24s linear infinite; }
+.spark:nth-child(7) { width: 5px; height: 5px; top: 45%; left: 55%; animation: drift2 26s linear infinite; }
+.spark:nth-child(8) { width: 6px; height: 6px; top: 50%; left: 12%; animation: drift3 21s linear infinite; }
+.spark:nth-child(9) { width: 3px; height: 3px; top: 55%; left: 80%; animation: drift4 27s linear infinite; }
+.spark:nth-child(10){ width: 5px; height: 5px; top: 60%; left: 35%; animation: drift5 23s linear infinite; }
+.spark:nth-child(11){ width: 4px; height: 4px; top: 65%; left: 90%; animation: drift1 29s linear infinite; }
+.spark:nth-child(12){ width: 6px; height: 6px; top: 70%; left: 5%; animation: drift2 32s linear infinite; }
+.spark:nth-child(13){ width: 5px; height: 5px; top: 75%; left: 60%; animation: drift3 19s linear infinite; }
+.spark:nth-child(14){ width: 4px; height: 4px; top: 80%; left: 25%; animation: drift4 31s linear infinite; }
+.spark:nth-child(15){ width: 7px; height: 7px; top: 85%; left: 75%; animation: drift5 18s linear infinite; }
+.spark:nth-child(16){ width: 3px; height: 3px; top: 20%; left: 50%; animation: drift1 33s linear infinite; }
+.spark:nth-child(17){ width: 5px; height: 5px; top: 30%; left: 15%; animation: drift2 22s linear infinite; }
+.spark:nth-child(18){ width: 6px; height: 6px; top: 40%; left: 65%; animation: drift3 28s linear infinite; }
+.spark:nth-child(19){ width: 4px; height: 4px; top: 50%; left: 30%; animation: drift4 25s linear infinite; }
+.spark:nth-child(20){ width: 5px; height: 5px; top: 60%; left: 85%; animation: drift5 20s linear infinite; }
+.spark:nth-child(21){ width: 4px; height: 4px; top: 70%; left: 45%; animation: drift1 27s linear infinite; }
+.spark:nth-child(22){ width: 6px; height: 6px; top: 15%; left: 30%; animation: drift2 24s linear infinite; }
+.spark:nth-child(23){ width: 3px; height: 3px; top: 80%; left: 70%; animation: drift3 30s linear infinite; }
+.spark:nth-child(24){ width: 5px; height: 5px; top: 25%; left: 95%; animation: drift4 26s linear infinite; }
+.spark:nth-child(25){ width: 7px; height: 7px; top: 55%; left: 10%; animation: drift5 29s linear infinite; }
+
+/* Drift animations unchanged */
+@keyframes drift1 { 0% { transform: translate(0, 0); } 25% { transform: translate(70px, -50px); } 50% { transform: translate(-30px, 60px); } 75% { transform: translate(-70px, -20px); } 100% { transform: translate(0, 0); } }
+@keyframes drift2 { 0% { transform: translate(0, 0); } 25% { transform: translate(-60px, 40px); } 50% { transform: translate(50px, -70px); } 75% { transform: translate(40px, 50px); } 100% { transform: translate(0, 0); } }
+@keyframes drift3 { 0% { transform: translate(0, 0); } 25% { transform: translate(50px, 60px); } 50% { transform: translate(-70px, -40px); } 75% { transform: translate(30px, -50px); } 100% { transform: translate(0, 0); } }
+@keyframes drift4 { 0% { transform: translate(0, 0); } 25% { transform: translate(-40px, -70px); } 50% { transform: translate(60px, 30px); } 75% { transform: translate(-50px, 50px); } 100% { transform: translate(0, 0); } }
+@keyframes drift5 { 0% { transform: translate(0, 0); } 25% { transform: translate(80px, 20px); } 50% { transform: translate(-50px, -60px); } 75% { transform: translate(20px, 70px); } 100% { transform: translate(0, 0); } }
+
+/* Even wider text/content area */
+.container {
     text-align: center;
-  }
-  
-  h1 {
-    font-size: 48px;
-    margin-top: 100px;
-  }
-  
-  p {
-    font-size: 24px;
-    margin-top: 50px;
-  }
-  
-  a {
-    color: #fff;
-  }
-  
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(5px) saturate(200%) brightness(120%);
+    -webkit-backdrop-filter: blur(5px) saturate(200%) brightness(120%);
+    padding: 40px 140px; /* Significantly increased horizontal padding for wider text */
+    border-radius: 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+                inset 0 2px 4px rgba(255, 255, 255, 0.1),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+    max-width: 900px; /* Wider max-width */
+    width: 96%; /* Takes up even more screen width */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-sizing: border-box;
+}
+
+h1 {
+    font-size: 42px;
+    margin: 0 0 8px 0;
+    font-weight: 500;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+}
+
+.title {
+    font-size: 18px;
+    margin: 0 0 26px 0;
+    color: #a0a0a0;
+    text-transform: uppercase;
+    letter-spacing: 3.5px;
+    font-weight: 300;
+}
+
+.intro {
+    font-size: clamp(16px, 4vw, 19px);
+    margin: 0 0 16px 0;
+    line-height: 1.5;
+    font-weight: 500;
+    color: #d0d0d0;
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 800px; /* Optional: limits text line length for readability */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.sub-intro {
+    font-size: 17px;
+    margin: 0 0 50px 0;
+    color: #b0b0b0;
+    line-height: 1.6;
+    font-weight: 400;
+    max-width: 700px; /* Keeps sub text from stretching too wide */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.icons a {
+    color: #e0e0e0;
+    font-size: 40px;
+    margin: 0 28px;
+    text-decoration: none;
+    transition: all 0.35s ease;
+}
+
+.icons a:hover {
+    color: #ffd700;
+    transform: translateY(-6px);
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.4));
+}
+
+/* Mobile adjustments for wider design */
+@media (max-width: 768px) {
+    .container {
+        padding: 35px 60px;
+        max-width: 95%;
+    }
+    .intro, .sub-intro {
+        max-width: none; /* Full width on smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 30px 30px;
+    }
+    h1 {
+        font-size: 32px;
+    }
+}
