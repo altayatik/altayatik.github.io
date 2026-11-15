@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://houseai-relay.altayatik.workers.dev; font-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'self'" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#08090c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>HomeView 3D — Smart Apartment Control Hub</title>
+  <link rel="stylesheet" href="/homeview/styles.css" />
+</head>
+<body>
+  <div id="app-root" class="hv-root">
+    <!-- Nightstand / Echo Show 15 Wall Dimmer Overlay -->
+    <div id="dimmer-overlay" class="hv-dimmer hidden" aria-hidden="true">
+      <div class="hv-dimmer-clock">
+        <div id="dimmer-time" class="hv-dimmer-time">12:00</div>
+        <div id="dimmer-date" class="hv-dimmer-date">Wednesday, Nov 11</div>
+        <div id="dimmer-sub" class="hv-dimmer-sub">Tap anywhere to wake HomeView 3D</div>
+      </div>
+    </div>
+
+    <!-- Authentication Gate (Only shown when unauthenticated) -->
+    <section id="auth-screen" class="hv-auth-screen" aria-label="HomeView Security Gate">
+      <div class="hv-auth-card">
+        <div class="hv-auth-header">
+          <div class="hv-logo-mark" aria-hidden="true">
+            <svg viewBox="0 0 36 36" fill="none">
+              <path d="M18 4L4 15.5V31a2 2 0 002 2h24a2 2 0 002-2V15.5L18 4z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+              <path d="M18 11l9 7v10H9V18l9-7z" fill="rgba(255,194,71,0.18)" stroke="#ffc247" stroke-width="1.6"/>
+              <circle cx="18" cy="21" r="2.6" fill="#ffc247"/>
+            </svg>
+          </div>
+          <div>
+            <div class="hv-eyebrow">ALTAY &amp; AIDI · HOUSE AI V2</div>
+            <h1 class="hv-auth-title">HomeView 3D</h1>
+          </div>
+        </div>
+
+        <div id="auth-network-badge" class="hv-net-badge">
+          <span class="hv-dot"></span>
+          <span id="auth-network-text">Verifying security context…</span>
+        </div>
+
+        <div id="auth-mode-tabs" class="hv-auth-tabs hidden" role="tablist">
+          <button type="button" id="tab-auth-otp" class="hv-auth-tab active" role="tab" aria-selected="true">
+            Local Wi-Fi One-Time Code
+          </button>
+          <button type="button" id="tab-auth-2fa" class="hv-auth-tab" role="tab" aria-selected="false">
+            2FA Authenticator
+          </button>
+        </div>
+
+        <p id="auth-instructions" class="hv-auth-desc">
+          Enter your 6-digit verification code to unlock the 3D apartment dashboard.
+        </p>
+
+        <form id="auth-form" autocomplete="off" novalidate>
+          <div id="passphrase-group" class="hv-field-group hidden">
+            <label for="auth-passphrase" class="hv-label">Account Passphrase</label>
+            <input id="auth-passphrase" type="password" class="hv-input" placeholder="Enter passphrase" autocomplete="current-password" />
+          </div>
+
+          <div class="hv-code-display" id="code-boxes" aria-label="6-digit security code">
+            <span class="hv-code-slot" data-idx="0"></span>
+            <span class="hv-code-slot" data-idx="1"></span>
+            <span class="hv-code-slot" data-idx="2"></span>
+            <span class="hv-code-sep">·</span>
+            <span class="hv-code-slot" data-idx="3"></span>
+            <span class="hv-code-slot" data-idx="4"></span>
+            <span class="hv-code-slot" data-idx="5"></span>
+          </div>
+          <input id="auth-code-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="7" class="hv-sr-only" aria-label="6-digit code" />
+
+          <div id="auth-error" class="hv-auth-error hidden" role="alert"></div>
+
+          <!-- Touch Keypad for Echo Show 15 & Tablets -->
+          <div class="hv-keypad" role="group" aria-label="Numeric keypad">
+            <button type="button" class="hv-key" data-key="1">1</button>
+            <button type="button" class="hv-key" data-key="2">2</button>
+            <button type="button" class="hv-key" data-key="3">3</button>
+            <button type="button" class="hv-key" data-key="4">4</button>
+            <button type="button" class="hv-key" data-key="5">5</button>
+            <button type="button" class="hv-key" data-key="6">6</button>
+            <button type="button" class="hv-key" data-key="7">7</button>
+            <button type="button" class="hv-key" data-key="8">8</button>
+            <button type="button" class="hv-key" data-key="9">9</button>
+            <button type="button" class="hv-key hv-key-fn" data-key="clear">CLR</button>
+            <button type="button" class="hv-key" data-key="0">0</button>
+            <button type="button" class="hv-key hv-key-fn" data-key="back" aria-label="Backspace">⌫</button>
+          </div>
+
+          <button type="submit" id="auth-submit-btn" class="hv-btn-primary hv-btn-full">
+            Unlock HomeView 3D
+          </button>
+        </form>
+
+        <div class="hv-auth-footer">
+          <span>Zero-trust encrypted session · SameSite=Strict · Anti-replay</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Authenticated Main 3D Dashboard -->
+    <main id="dashboard-screen" class="hv-dashboard hidden" aria-label="HomeView 3D Dashboard">
+      <!-- Top Wall Display Bar (Time, Date, Weather, Camera Presets, Quick System Actions) -->
+      <header class="hv-topbar">
+        <div class="hv-topbar-left">
+          <div class="hv-brand-clock">
+            <div class="hv-clock-row">
+              <span id="hud-clock" class="hv-clock">12:00 PM</span>
+              <span id="hud-mode-badge" class="hv-badge hv-badge-live">LIVE</span>
+            </div>
+            <div id="hud-date" class="hv-date">Wednesday, Nov 11</div>
+          </div>
+
+          <!-- Weather Widget Pill (Echo Show 15 Wall Essential) -->
+          <button type="button" id="weather-pill" class="hv-weather-pill" aria-label="Weather details">
+            <span id="weather-icon" class="hv-weather-icon" aria-hidden="true">☀</span>
+            <div class="hv-weather-main">
+              <div class="hv-weather-temp-row">
+                <span id="weather-temp" class="hv-weather-temp">--°F</span>
+                <span id="weather-cond" class="hv-weather-cond">Loading…</span>
+              </div>
+              <div id="weather-sub" class="hv-weather-sub">Chicago · H:--° L:--°</div>
+            </div>
+          </button>
+
+          <!-- Indoor Climate Quick Chip -->
+          <button type="button" id="climate-quick-pill" class="hv-climate-pill" aria-label="Thermostat quick control">
+            <span class="hv-climate-dot" id="climate-dot"></span>
+            <div>
+              <div class="hv-climate-temp"><span id="hud-indoor-temp">71</span>°F Indoor</div>
+              <div class="hv-climate-sub" id="hud-indoor-sub">Target 71°F · Idle</div>
+            </div>
+          </button>
+        </div>
+
+        <!-- Center Camera Viewpoint Switcher -->
+        <nav class="hv-cam-bar" id="camera-bar" aria-label="3D Viewpoints">
+          <button type="button" class="hv-cam-btn active" data-cam="dollhouse">Dollhouse</button>
+          <button type="button" class="hv-cam-btn" data-cam="floorplan">Top Plan</button>
+          <button type="button" class="hv-cam-btn" data-cam="observerCamera-e35ed994-1f0a-44fc-ab53-5edc73b436c3">Living Room</button>
+          <button type="button" class="hv-cam-btn" data-cam="observerCamera-3df96468-60df-4bca-a91a-2c6be9c60436">Kitchen</button>
+          <button type="button" class="hv-cam-btn" data-cam="observerCamera-ac9a9697-ec3a-4d00-a16b-7bcbd3b31872">Bedroom</button>
+          <button type="button" class="hv-cam-btn" data-cam="observerCamera-4c5ae223-5327-4077-af0e-5860be2d2b9f">Den</button>
+        </nav>
+
+        <!-- Right System Controls -->
+        <div class="hv-topbar-right">
+          <button type="button" id="btn-cutaway" class="hv-icon-btn active" title="Toggle Wall Cutaway" aria-label="Toggle Wall Cutaway">
+            <span>Cutaway</span>
+          </button>
+          <button type="button" id="btn-autotour" class="hv-icon-btn" title="Auto-Orbit Showcase" aria-label="Auto-Orbit Showcase">
+            <span>Orbit</span>
+          </button>
+          <button type="button" id="btn-dimmer" class="hv-icon-btn" title="Nightstand Dimmer" aria-label="Nightstand Dimmer">
+            <span>🌙</span>
+          </button>
+          <button type="button" id="btn-toggle-sidebar" class="hv-icon-btn active" title="Toggle Control Deck" aria-label="Toggle Control Deck">
+            <span>Controls</span>
+          </button>
+          <button type="button" id="btn-logout" class="hv-icon-btn hv-icon-btn-subtle" title="Lock Dashboard" aria-label="Lock Dashboard">
+            <span>🔒</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Stage: 3D WebGL Viewport + Floating HUD + Side Control Deck -->
+      <div class="hv-stage" id="hv-stage">
+        <!-- 3D Viewport Container -->
+        <div class="hv-viewport" id="viewport-container">
+          <canvas id="sh3d-canvas" class="hv-canvas"></canvas>
+
+          <!-- Projected 3D Device Pins Layer -->
+          <div id="pins-layer" class="hv-pins-layer" aria-live="polite"></div>
+
+          <!-- Room Labels Layer in 3D -->
+          <div id="rooms-layer" class="hv-rooms-layer" aria-hidden="true"></div>
+
+          <!-- Bottom-Left 3D Pin Filter Bar & Zoom Controls -->
+          <div class="hv-viewport-controls">
+            <div class="hv-pin-filters" role="group" aria-label="3D Pin Filters">
+              <button type="button" class="hv-filter-chip active" data-filter="all">All Pins</button>
+              <button type="button" class="hv-filter-chip" data-filter="light">💡 Lights</button>
+              <button type="button" class="hv-filter-chip" data-filter="appliance">🫧 Appliances</button>
+              <button type="button" class="hv-filter-chip" data-filter="sensor">🛡 Sensors &amp; Power</button>
+              <button type="button" class="hv-filter-chip" data-filter="none">Clean 3D</button>
+            </div>
+
+            <div class="hv-zoom-controls" role="group" aria-label="Camera Zoom">
+              <button type="button" id="btn-zoom-in" class="hv-zoom-btn" aria-label="Zoom in">+</button>
+              <button type="button" id="btn-zoom-out" class="hv-zoom-btn" aria-label="Zoom out">−</button>
+              <button type="button" id="btn-cam-reset" class="hv-zoom-btn" aria-label="Reset view">⟲</button>
+            </div>
+          </div>
+
+          <!-- Quick Floating Room Lighting Dock at Bottom Center of 3D View -->
+          <div class="hv-quick-dock" id="quick-light-dock" aria-label="Quick Lighting Controls">
+            <button type="button" class="hv-dock-btn hv-dock-master-on" data-light-action="on" data-light-target="all">
+              ☀ All On
+            </button>
+            <button type="button" class="hv-dock-btn hv-dock-master-off" data-light-action="off" data-light-target="all">
+              🌙 All Off
+            </button>
+            <span class="hv-dock-divider"></span>
+            <button type="button" class="hv-dock-btn" data-room-toggle="living room" id="dock-room-living">
+              Living Room <span class="hv-dock-count" id="dock-cnt-living">0/2</span>
+            </button>
+            <button type="button" class="hv-dock-btn" data-room-toggle="bedroom" id="dock-room-bedroom">
+              Bedroom <span class="hv-dock-count" id="dock-cnt-bedroom">0/2</span>
+            </button>
+            <button type="button" class="hv-dock-btn" data-room-toggle="den" id="dock-room-den">
+              Den <span class="hv-dock-count" id="dock-cnt-den">0/1</span>
+            </button>
+            <button type="button" class="hv-dock-btn" data-room-toggle="hallway" id="dock-room-hallway">
+              Hallway <span class="hv-dock-count" id="dock-cnt-hallway">0/1</span>
+            </button>
+          </div>
+
+          <!-- Selected 3D Device Floating Popover Card -->
+          <div id="device-popover" class="hv-device-popover hidden" role="dialog" aria-label="Selected Device Controls">
+            <div class="hv-popover-head">
+              <div>
+                <div id="popover-room" class="hv-popover-eyebrow">ROOM</div>
+                <h3 id="popover-title" class="hv-popover-title">Device</h3>
+              </div>
+              <button type="button" id="popover-close" class="hv-popover-close" aria-label="Close">✕</button>
+            </div>
+            <div id="popover-body" class="hv-popover-body"></div>
+          </div>
+
+          <!-- Weather Forecast Modal Card -->
+          <div id="weather-popover" class="hv-weather-popover hidden" role="dialog" aria-label="Chicago Weather Forecast">
+            <div class="hv-popover-head">
+              <div>
+                <div class="hv-popover-eyebrow">OUTDOOR CONDITIONS · CHICAGO</div>
+                <h3 id="weather-modal-title" class="hv-popover-title">Current Weather</h3>
+              </div>
+              <button type="button" id="weather-popover-close" class="hv-popover-close" aria-label="Close">✕</button>
+            </div>
+            <div id="weather-modal-body" class="hv-popover-body"></div>
+          </div>
+        </div>
+
+        <!-- Right Side Control Deck (Full HomeView Parity) -->
+        <aside class="hv-sidebar" id="control-sidebar" aria-label="HomeView Control Deck">
+          <div class="hv-deck-tabs" role="tablist">
+            <button type="button" class="hv-deck-tab active" data-tab="home" role="tab">Home</button>
+            <button type="button" class="hv-deck-tab" data-tab="appliances" role="tab">Appliances</button>
+            <button type="button" class="hv-deck-tab" data-tab="sensors" role="tab">Sensors &amp; ⚡</button>
+            <button type="button" class="hv-deck-tab" data-tab="lists" role="tab">Lists &amp; Bot</button>
+          </div>
+
+          <!-- Tab 1: Home (Alerts, Lighting, Climate, Air Purifier) -->
+          <div class="hv-deck-pane active" id="pane-home">
+            <div id="alerts-section" class="hv-card hv-card-alert hidden"></div>
+
+            <!-- Lighting Matrix Card -->
+            <section class="hv-card">
+              <div class="hv-card-header">
+                <div>
+                  <div class="hv-card-eyebrow">LIGHTING · 6 SMART LAMPS</div>
+                  <h2 class="hv-card-title" id="lights-summary-title">Lights</h2>
+                </div>
+                <div class="hv-btn-group">
+                  <button type="button" class="hv-chip-btn" data-light-action="on" data-light-target="all">All On</button>
+                  <button type="button" class="hv-chip-btn" data-light-action="off" data-light-target="all">All Off</button>
+                </div>
+              </div>
+              <div id="lights-grid" class="hv-lights-grid"></div>
+            </section>
+
+            <!-- Climate Thermostat Card -->
+            <section class="hv-card">
+              <div class="hv-card-header">
+                <div>
+                  <div class="hv-card-eyebrow">CLIMATE · NEST THERMOSTAT</div>
+                  <h2 class="hv-card-title" id="climate-card-title">71°F Indoor</h2>
+                </div>
+                <span id="climate-hvac-badge" class="hv-status-pill">Idle</span>
+              </div>
+              <div class="hv-thermostat-row">
+                <button type="button" id="btn-temp-down" class="hv-round-btn" aria-label="Decrease target temperature">−</button>
+                <div class="hv-thermostat-Readout">
+                  <div class="hv-thermostat-target"><span id="climate-target-val">71</span>°F</div>
+                  <div class="hv-thermostat-range">Clamped 65°F – 80°F</div>
+                </div>
+                <button type="button" id="btn-temp-up" class="hv-round-btn" aria-label="Increase target temperature">+</button>
+              </div>
+              <div class="hv-mode-pills" id="climate-modes">
+                <button type="button" class="hv-chip-btn" data-climate-mode="cool">❄ Cool</button>
+                <button type="button" class="hv-chip-btn" data-climate-mode="heat">🔥 Heat</button>
+                <button type="button" class="hv-chip-btn" data-climate-mode="heat_cool">Auto</button>
+              </div>
+            </section>
+
+            <!-- Dyson Bedroom Air Purifier Card -->
+            <section class="hv-card">
+              <div class="hv-card-header">
+                <div>
+                  <div class="hv-card-eyebrow">BEDROOM · DYSON HUSHJET</div>
+                  <h2 class="hv-card-title" id="purifier-title">Air Purifier</h2>
+                </div>
+                <button type="button" id="btn-purifier-toggle" class="hv-chip-btn">Toggle</button>
+              </div>
+              <div class="hv-slider-row">
+                <label for="purifier-slider" class="hv-slider-label">Fan Speed: <span id="purifier-speed-val">--%</span></label>
+                <input id="purifier-slider" type="range" min="0" max="100" step="10" value="50" class="hv-slider" />
+              </div>
+            </section>
+          </div>
+
+          <!-- Tab 2: Appliances & Water (Dishwasher, Laundry, AquaTru, TV, Speaker) -->
+          <div class="hv-deck-pane" id="pane-appliances">
+            <!-- Dishwasher -->
+            <section class="hv-card">
+              <div class="hv-card-header">
+                <div>
+                  <div class="hv-card-eyebrow">KITCHEN · DISHWASHER</div>
+                  <h2 class="hv-card-title" id="dishwasher-title">Idle</h2>
+                </div>
+                <span id="dishwasher-badge" class="hv-status-pill">Ready</span>
+              </div>
+              <div id="dishwasher-metrics" class="hv-subtext">0 W current · 0.0 kWh today</div>
+              <div class="hv-btn-row-3">
+                <button type="button" class="hv-chip-btn" data-dw-action="clean">✨ Clean</button>
+                <button type="button" class="hv-chip-btn" data-dw-action="dirty">🍽 Dirty</button>
+                <button type="button" class="hv-chip-btn" data-dw-action="idle">✓ Emptied</button>
+              </div>
+            </section>
+
+            <!-- Laundry (Washer & Dryer) -->
+            <section class="hv-card">
+              <div class="hv-card-header">
+                <div>
+                  <div class="hv-card-eyebrow">LAUNDRY CLOSET · GE SMART</div>
+                  <h2 class="hv-card-title">Washer &amp; Dryer</h2>
+                </div>
+              </div>
+              <div id="laundry-list" class="hv-stack"></div>
+            </section>
+
+            <!-- AquaTru Water Purifier -->
+            <section class="hv-card">
+              <div class="hv-card-header">
+                <div>
+                  <div class="hv-card-eyebrow">KITCHEN · AQUATRU RO WATER</div>
+                  <h2 class="hv-card-title" id="aquatru-title">Clean Water Ready</h2>
+                </div>
+                <span id="aquatru-tds-badge" class="hv-status-pill hv-pill-aqua">14 ppm</span>
+              </div>
+              <div id="aquatru-details" class="hv-stack"></div>
+            </section>
+
+            <!-- Bedroom TV & House Speaker -->
+            <section class="hv-card">
+              <div class="hv-card-header">
+                <div>
+                  <div class="hv-card-eyebrow">MEDIA &amp; VOICE</div>
+                  <h2 class="hv-card-title" id="tv-title">Bedroom TV &amp; Speaker</h2>
+                </div>
+              </div>
+              <div id="tv-controls" class="hv-btn-row-wrap">
+                <button type="button" class="hv-chip-btn" data-tv-action="on">TV On</button>
+                <button type="button" class="hv-chip-btn" data-tv-action="off">TV Off</button>
+                <button type="button" class="hv-chip-btn" data-tv-action="play_pause">⏯ Play/Pause</button>
+                <button type="button" class="hv-chip-btn" data-tv-action="volume_down">🔉 Vol −</button>
+                <button type="button" class="hv-chip-btn" data-tv-action="volume_up">🔊 Vol +</button>
+              </div>
+              <form id="speaker-form" class="hv-inline-form">
+                <input id="speaker-input" type="text" class="hv-input" placeholder="Announce on House Speaker…" maxlength="220" />
+                <button type="submit" class="hv-btn-primary">Speak</button>
+              </form>
+            </section>
+          </div>
+
+          <!-- Tab 3: Sensors & Energy -->
+          <div class="hv-deck-pane" id="pane-sensors">
+            <section class="hv-card">
+              <div class="hv-card-header">
+                <div>
+                  <div class="hv-card-eyebrow">LIVE TELEMETRY</div>
+                  <h2 class="hv-card-title">Doors, Windows &amp; Sensors</h2>
+                </div>
+              </div>
+              <div id="sensors-list" class="hv-sensors-list"></div>
+            </section>
+
+            <section class="hv-card">
+              <div class="hv-card-header">
+                <div>
+                  <div class="hv-card-eyebrow">HOME ASSISTANT ENERGY · 7 DAYS</div>
+                  <h2 class="hv-card-title">Energy &amp; Battery Stations</h2>
+                </div>
+              </div>
+              <div id="energy-list" class="hv-stack"></div>
+            </section>
+          </div>
+
+          <!-- Tab 4: Lists, Reminders, Chat & Safety -->
+          <div class="hv-deck-pane" id="pane-lists">
+            <!-- Chat with Home Bot -->
+            <section class="hv-card">
+              <div class="hv-card-header">
+                <div>
+                  <div class="hv-card-eyebrow">HOUSE AI BUTLER · QWEN 3.6</div>
+                  <h2 class="hv-card-title">Ask Home Bot</h2>
+                </div>
+              </div>
+              <div id="chat-log" class="hv-chat-log"></div>
+              <form id="chat-form" class="hv-inline-form">
+                <input id="chat-input" type="text" class="hv-input" placeholder="Ask Home Bot anything…" maxlength="400" />
+                <button type="submit" id="chat-send-btn" class="hv-btn-primary">Send</button>
+              </form>
+            </section>
+
+            <!-- Groceries -->
+            <section class="hv-card">
+              <div class="hv-card-header">
+                <div>
+                  <div class="hv-card-eyebrow">SHARED LIST</div>
+                  <h2 class="hv-card-title">Groceries Needed</h2>
+                </div>
+              </div>
+              <div id="groceries-list" class="hv-chip-list"></div>
+              <form id="grocery-form" class="hv-inline-form">
+                <input id="grocery-input" type="text" class="hv-input" placeholder="Add grocery item…" maxlength="80" />
+                <button type="submit" class="hv-chip-btn">+ Add</button>
+              </form>
+            </section>
+
+            <!-- Reminders & Chores -->
+            <section class="hv-card">
+              <div class="hv-card-header">
+                <div>
+                  <div class="hv-card-eyebrow">HOUSEHOLD SCHEDULE</div>
+                  <h2 class="hv-card-title">Reminders &amp; Chores</h2>
+                </div>
+              </div>
+              <div id="reminders-chores-list" class="hv-stack"></div>
+            </section>
+
+            <!-- Packages -->
+            <section class="hv-card">
+              <div class="hv-card-header">
+                <div>
+                  <div class="hv-card-eyebrow">17TRACK &amp; USPS</div>
+                  <h2 class="hv-card-title">Deliveries</h2>
+                </div>
+              </div>
+              <div id="packages-list" class="hv-stack"></div>
+            </section>
+
+            <!-- Master Kill Switch & Practice Mode -->
+            <section class="hv-card hv-card-safety">
+              <div class="hv-card-header">
+                <div>
+                  <div class="hv-card-eyebrow">SAFETY GUARDRAILS</div>
+                  <h2 class="hv-card-title">Master Kill Switch</h2>
+                </div>
+              </div>
+              <div class="hv-btn-row-wrap">
+                <button type="button" id="btn-kill-switch" class="hv-btn-danger">
+                  🛑 Stop Home Bot &amp; Lock Devices
+                </button>
+                <button type="button" id="btn-practice-mode" class="hv-chip-btn">
+                  Practice Mode: OFF
+                </button>
+              </div>
+            </section>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Toast Notification Banner -->
+      <div id="toast-banner" class="hv-toast hidden" role="status" aria-live="polite"></div>
+    </main>
+  </div>
+  <script src="/homeview/app.js"></script>
+</body>
+</html>
